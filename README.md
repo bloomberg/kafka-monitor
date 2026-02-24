@@ -1,20 +1,18 @@
-<p align="center">
-  <img src="/docs/images/xinfra_monitor.png" width="510"/>
-</p>
+# Xinfra Monitor (Fork)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/bloomberg/kafka-monitor/badge)](https://scorecard.dev/viewer/?uri=github.com/bloomberg/kafka-monitor)
+[![Contributor-Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-fbab2c.svg)](CODE_OF_CONDUCT.md)
+This repository is a publicly maintained fork of LinkedIn's [Xinfra Monitor](https://github.com/linkedin/kafka-monitor), a tool used to monitor the availability and End-To-End latencies of Kafka clusters. 
+
+The original repository is no longer maintained by LinkedIn (last release dated 2023), and this fork is intended to continue the development and maintenance of the project under the stewardship of Bloomberg.
+
 
 # Xinfra Monitor
-[![Build Status](https://travis-ci.org/linkedin/kafka-monitor.svg?branch=master)](https://travis-ci.org/linkedin/kafka-monitor)
-![Greetings](https://github.com/linkedin/kafka-monitor/workflows/Greetings/badge.svg)
-![Mark stale issues and pull requests](https://github.com/linkedin/kafka-monitor/workflows/Mark%20stale%20issues%20and%20pull%20requests/badge.svg)
-![Pull Request Labeler](https://github.com/linkedin/kafka-monitor/workflows/Pull%20Request%20Labeler/badge.svg)
-
 Xinfra Monitor (formerly Kafka Monitor) is a framework to implement and execute long-running kafka
 system tests in a real cluster. It complements Kafka’s existing system
 tests by capturing potential bugs or regressions that are only likely to occur
 after prolonged period of time or with low probability. Moreover, it allows you to monitor Kafka
 cluster using end-to-end pipelines to obtain a number of derived vital stats
 such as
-
 <ol>
  <li> 
   End-to-end latency

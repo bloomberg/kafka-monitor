@@ -1,27 +1,58 @@
-Contribution Agreement
-======================
+# How to Contribute
 
-As a contributor, you represent that the code you submit is your
-original work or that of your employer (in which case you represent you
-have the right to bind your employer).  By submitting code, you (and, if
-applicable, your employer) are licensing the submitted code to LinkedIn
-and the open source community subject to the Apache 2.0 license. 
+Thanks for your interest in contributing to `kafka-monitor`! Here are a few
+general guidelines on contributing and reporting bugs that we ask you to review.
+Following these guidelines helps to communicate that you respect the time of the
+contributors managing and developing this open source project. In return, they
+should reciprocate that respect in addressing your issue, assessing changes, and
+helping you finalize your pull requests. In that spirit of mutual respect, we
+endeavor to review incoming issues and pull requests within 10 days, and will
+close any lingering issues or pull requests after 60 days of inactivity.
 
-Responsible Disclosure of Security Vulnerabilities
-==================================================
+Please note that all of your interactions in the project are subject to our
+[Code of Conduct](/CODE_OF_CONDUCT.md). This includes creation of issues or pull
+requests, commenting on issues or pull requests, and extends to all interactions
+in any real-time space e.g., Slack, Discord, etc.
 
-Please do not file reports on Github for security issues.
-Please review the guidelines on at 
-https://www.linkedin.com/help/linkedin/answer/62924/security-vulnerabilities?lang=en
+## Reporting Issues
 
-Tips for Getting Your Pull Request Accepted
-===========================================
+Before reporting a new issue, please ensure that the issue was not already
+reported or fixed by searching through our [issues
+list](https://github.com/org_name/repo_name/issues).
 
-1. Make sure all new features are tested and the tests pass.
-2. Bug fixes must include a test case demonstrating the error that it fixes.
+When creating a new issue, please be sure to include a **title and clear
+description**, as much relevant information as possible, and, if possible, a
+test case.
 
-Reporting Issues
-===============
-Please use the [link](https://github.com/linkedin/kafka-monitor/issues/new) for reporting any issues.
+**If you discover a security bug, please do not report it through GitHub.
+Instead, please see security procedures in [SECURITY.md](/SECURITY.md).**
 
+## Sending Pull Requests
 
+Before sending a new pull request, take a look at existing pull requests and
+issues to see if the proposed change or fix has been discussed in the past, or
+if the change was already implemented but not yet released.
+
+We expect new pull requests to include tests for any affected behavior, and, as
+we follow semantic versioning, we may reserve breaking changes until the next
+major version release.
+
+## Other Ways to Contribute
+
+We welcome anyone that wants to contribute to `kafka-monitor` to triage and
+reply to open issues to help troubleshoot and fix existing bugs. Here is what
+you can do:
+
+- Help ensure that existing issues follows the recommendations from the
+  _[Reporting Issues](#reporting-issues)_ section, providing feedback to the
+  issue's author on what might be missing.
+- Review and update the existing content of our
+  [Wiki](https://github.com/org_name/repo_name/wiki) with up-to-date
+  instructions and code samples.
+- Review existing pull requests, and testing patches against real existing
+  applications that use `kafka-monitor`.
+- Write a test, or add a missing test case to an existing test.
+
+Thanks again for your interest on contributing to `kafka-monitor`!
+
+:heart:
