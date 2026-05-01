@@ -1,6 +1,7 @@
 # Xinfra Monitor (Fork)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/bloomberg/kafka-monitor/badge)](https://scorecard.dev/viewer/?uri=github.com/bloomberg/kafka-monitor)
 [![Contributor-Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-fbab2c.svg)](CODE_OF_CONDUCT.md)
+
 This repository is a publicly-maintained fork of LinkedIn's [Xinfra Monitor](https://github.com/linkedin/kafka-monitor), a tool used to monitor the availability and end-to-end latency of Kafka clusters. 
 
 The original repository is no longer maintained by LinkedIn (last release dated 2023), and this fork is intended to continue the development and maintenance of the project under the stewardship of Bloomberg.

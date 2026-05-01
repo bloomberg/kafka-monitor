@@ -32,4 +32,3 @@ testng = { module = "org.testng:testng", version.ref = "testng" }
 zookeeper = { module = "org.apache.zookeeper:zookeeper", version.ref = "zookeeper" }
 
 [plugins]
-semantic-build-versioning = { id = "net.vivin.gradle-semantic-build-versioning", version = "4.0.0" }

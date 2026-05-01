@@ -1,0 +1,30 @@
+project:
+  name: kafka-monitor
+  description: Kafka Monitor - Xinfra Monitor for Apache Kafka
+  website: https://github.com/bloomberg/kafka-monitor
+  authors:
+    - Bloomberg
+    - LinkedIn
+  license: Apache-2.0
+
+release:
+  github:
+    overwrite: true
+    tagName: "{{projectVersion}}"
+    changelog:
+      formatted: ALWAYS
+      format: "- {{commitShortHash}} {{commitTitle}}"
+      contributors:
+        format: "- {{contributorName}}"
+      contentTemplate: src/jreleaser/changelog.tpl
+      hide:
+        contributors:
+          - GitHub
+          - dependabot[bot]
+
+distributions:
+  kafka-monitor:
+    type: BINARY
+    artifacts:
+      - path: build/distributions/kafka-monitor-{{projectVersion}}.tar.gz
+      - path: build/distributions/kafka-monitor-{{projectVersion}}.zip
