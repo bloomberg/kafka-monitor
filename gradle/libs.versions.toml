@@ -1,0 +1,35 @@
+[versions]
+argparse4j = "0.9.0"
+avro = "1.9.2"
+avroutil1 = "0.2.118"
+commons-lang3 = "3.12.0"
+graphite-client = "1.1.0-RELEASE"
+java-statsd-client = "3.0.2"
+jolokia = "1.7.2"
+json = "20140107"
+kafka = "2.8.2"
+log4j = "2.17.1"
+mockito = "3.12.4"
+signalfx = "0.0.47"
+testng = "6.8.8"
+zookeeper = "3.8.0"
+
+[libraries]
+argparse4j = { module = "net.sourceforge.argparse4j:argparse4j", version.ref = "argparse4j" }
+avro = { module = "org.apache.avro:avro", version.ref = "avro" }
+avroutil1-helper-all = { module = "com.linkedin.avroutil1:helper-all", version.ref = "avroutil1" }
+commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons-lang3" }
+graphite-client = { module = "net.savantly:graphite-client", version.ref = "graphite-client" }
+java-statsd-client = { module = "com.timgroup:java-statsd-client", version.ref = "java-statsd-client" }
+jolokia-jvm = { module = "org.jolokia:jolokia-jvm", version.ref = "jolokia" }
+json = { module = "org.json:json", version.ref = "json" }
+kafka = { module = "org.apache.kafka:kafka_2.12", version.ref = "kafka" }
+kafka-clients = { module = "org.apache.kafka:kafka-clients", version.ref = "kafka" }
+log4j-slf4j-impl = { module = "org.apache.logging.log4j:log4j-slf4j-impl", version.ref = "log4j" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+signalfx-codahale = { module = "com.signalfx.public:signalfx-codahale", version.ref = "signalfx" }
+testng = { module = "org.testng:testng", version.ref = "testng" }
+zookeeper = { module = "org.apache.zookeeper:zookeeper", version.ref = "zookeeper" }
+
+[plugins]
+semantic-build-versioning = { id = "net.vivin.gradle-semantic-build-versioning", version = "4.0.0" }
