@@ -1,11 +1,13 @@
 project:
   name: kafka-monitor
   description: Kafka Monitor - Xinfra Monitor for Apache Kafka
-  website: https://github.com/bloomberg/kafka-monitor
+  links:
+    homepage: https://github.com/bloomberg/kafka-monitor
   authors:
     - Bloomberg
     - LinkedIn
   license: Apache-2.0
+  copyright: Bloomberg LP
 
 release:
   github:
