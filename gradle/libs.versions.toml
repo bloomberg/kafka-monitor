@@ -12,7 +12,7 @@ log4j = "2.17.1"
 mockito = "3.12.4"
 signalfx = "0.0.47"
 testng = "7.12.0"
-zookeeper = "3.8.0"
+zookeeper = "3.9.5"
 
 [libraries]
 argparse4j = { module = "net.sourceforge.argparse4j:argparse4j", version.ref = "argparse4j" }
