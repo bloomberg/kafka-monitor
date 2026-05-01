@@ -16,7 +16,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import kafka.admin.BrokerMetadata;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.CreateTopicsResult;
 import org.apache.kafka.clients.admin.DescribeClusterResult;
@@ -31,7 +30,6 @@ import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import scala.Option;
 
 
 /**
@@ -82,17 +80,12 @@ public class MultiClusterTopicManagementServiceTest {
 
   @Test(invocationCount = 2)
   protected void maybeAddPartitionsTest() {
-    Set<BrokerMetadata> brokerMetadataSet = new LinkedHashSet<>();
-    for (Node broker : nodeSet) {
-      brokerMetadataSet.add(new BrokerMetadata(broker.id(), Option.apply(broker.rack())));
-    }
-
     int minPartitionNum = 14;
     int partitionNum = 5;
     int rf = 4;
 
     List<List<Integer>> newPartitionAssignments =
-        MultiClusterTopicManagementService.TopicManagementHelper.newPartitionAssignments(minPartitionNum, partitionNum, brokerMetadataSet, rf);
+        MultiClusterTopicManagementService.TopicManagementHelper.newPartitionAssignments(minPartitionNum, partitionNum, nodeSet, rf);
     Assert.assertNotNull(newPartitionAssignments);
 
     System.out.println(newPartitionAssignments);

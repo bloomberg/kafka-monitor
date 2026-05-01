@@ -34,12 +34,12 @@ import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import kafka.admin.BrokerMetadata;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.Decoder;
 import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.common.Node;
 import org.apache.kafka.clients.admin.CreateTopicsResult;
 import org.apache.kafka.clients.admin.ListPartitionReassignmentsResult;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -106,18 +106,18 @@ public class Utils {
     return partitionReassignments;
   }
 
-  public static List<Integer> replicaIdentifiers(Set<BrokerMetadata> brokers) {
+  public static List<Integer> replicaIdentifiers(Set<Node> brokers) {
     if (brokers == null || brokers.size() == 0) {
       throw new IllegalArgumentException("brokers are either null or empty.");
     }
 
-    List<BrokerMetadata> brokerMetadataList = new ArrayList<>(brokers);
+    List<Node> brokerList = new ArrayList<>(brokers);
 
     // Shuffle to get a random order in the replica list
-    Collections.shuffle(brokerMetadataList);
+    Collections.shuffle(brokerList);
 
     // Get broker ids for replica list
-    List<Integer> replicaList = brokerMetadataList.stream().map(m -> m.id()).collect(Collectors.toList());
+    List<Integer> replicaList = brokerList.stream().map(Node::id).collect(Collectors.toList());
 
     return replicaList;
   }

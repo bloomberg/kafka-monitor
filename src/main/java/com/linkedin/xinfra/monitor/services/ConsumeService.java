@@ -38,7 +38,7 @@ import org.apache.kafka.common.metrics.MetricConfig;
 import org.apache.kafka.common.metrics.Metrics;
 import org.apache.kafka.common.metrics.MetricsReporter;
 import org.apache.kafka.common.metrics.stats.CumulativeSum;
-import org.apache.kafka.common.utils.SystemTime;
+import org.apache.kafka.common.utils.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +94,7 @@ public class ConsumeService extends AbstractService {
       MetricConfig metricConfig = new MetricConfig().samples(60).timeWindow(1000, TimeUnit.MILLISECONDS);
       List<MetricsReporter> reporters = new ArrayList<>();
       reporters.add(new JmxReporter(JMX_PREFIX));
-      metrics = new Metrics(metricConfig, reporters, new SystemTime());
+      metrics = new Metrics(metricConfig, reporters, Time.SYSTEM);
       tags = new HashMap<>();
       tags.put(TAGS_NAME, name);
       _topic = consumerFactory.topic();

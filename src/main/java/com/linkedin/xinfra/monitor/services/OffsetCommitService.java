@@ -33,6 +33,7 @@ import org.apache.kafka.clients.ClientResponse;
 import org.apache.kafka.clients.ClientUtils;
 import org.apache.kafka.clients.KafkaClient;
 import org.apache.kafka.clients.Metadata;
+import org.apache.kafka.clients.MetadataRecoveryStrategy;
 import org.apache.kafka.clients.NetworkClient;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -106,7 +107,7 @@ public class OffsetCommitService implements Service {
 
     List<String> bootstrapServers = config.getList(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG);
     List<InetSocketAddress> addresses =
-        ClientUtils.parseAndValidateAddresses(bootstrapServers, ClientDnsLookup.DEFAULT);
+        ClientUtils.parseAndValidateAddresses(bootstrapServers, ClientDnsLookup.USE_ALL_DNS_IPS);
 
     LogContext logContext = new LogContext("[Consumer clientId=" + clientId + "] ");
 
@@ -114,7 +115,9 @@ public class OffsetCommitService implements Service {
 
     LOGGER.info("Bootstrap servers config: {} | broker addresses: {}", bootstrapServers, addresses);
 
-    Metadata metadata = new Metadata(retryBackoffMs, config.getLong(ConsumerConfig.METADATA_MAX_AGE_CONFIG), logContext,
+    Metadata metadata = new Metadata(retryBackoffMs,
+        config.getLong(ConsumerConfig.RETRY_BACKOFF_MAX_MS_CONFIG),
+        config.getLong(ConsumerConfig.METADATA_MAX_AGE_CONFIG), logContext,
         new ClusterResourceListeners());
 
     metadata.bootstrap(addresses);
@@ -130,8 +133,8 @@ public class OffsetCommitService implements Service {
         config.getInt(ConsumerConfig.SEND_BUFFER_CONFIG), config.getInt(ConsumerConfig.RECEIVE_BUFFER_CONFIG),
         config.getInt(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG),
         config.getLong(ConsumerConfig.SOCKET_CONNECTION_SETUP_TIMEOUT_MS_CONFIG), config.getLong(ConsumerConfig.SOCKET_CONNECTION_SETUP_TIMEOUT_MAX_MS_CONFIG),
-        ClientDnsLookup.DEFAULT, _time, true,
-        new ApiVersions(), logContext);
+        _time, true,
+        new ApiVersions(), logContext, MetadataRecoveryStrategy.NONE);
 
 
     LOGGER.debug("The network client active: {}", kafkaClient.active());
