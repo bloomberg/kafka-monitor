@@ -35,8 +35,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import kafka.admin.AdminUtils;
-import kafka.admin.BrokerMetadata;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.AlterConfigOp;
@@ -58,9 +56,6 @@ import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.config.ConfigResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Option$;
-import scala.collection.JavaConverters;
-import scala.collection.Seq;
 
 
 /**
@@ -345,11 +340,7 @@ public class MultiClusterTopicManagementService implements Service {
       }
       LOGGER.info("{} will increase partition of the topic {} in the cluster from {}" + " to {}.",
               this.getClass().toString(), _topic, currPartitionNum,  requiredMinPartitionNum);
-      Set<BrokerMetadata> brokers = new HashSet<>();
-      for (Node broker : _adminClient.describeCluster().nodes().get(_requestTimeout.toMillis(), TimeUnit.MILLISECONDS)) {
-        BrokerMetadata brokerMetadata = new BrokerMetadata(broker.id(), null);
-        brokers.add(brokerMetadata);
-      }
+      Set<Node> brokers = new HashSet<>(_adminClient.describeCluster().nodes().get(_requestTimeout.toMillis(), TimeUnit.MILLISECONDS));
       Set<Integer> excludedBrokers = _topicFactory.getExcludedBrokers(_adminClient);
       if (!excludedBrokers.isEmpty()) {
         brokers.removeIf(broker ->  excludedBrokers.contains(broker.id()));
@@ -368,7 +359,7 @@ public class MultiClusterTopicManagementService implements Service {
     }
 
     static List<List<Integer>> newPartitionAssignments(int minPartitionNum, int partitionNum,
-        Set<BrokerMetadata> brokers, int rf) {
+        Set<Node> brokers, int rf) {
 
       // The replica assignments for the new partitions, and not the old partitions.
       // .increaseTo(6, asList(asList(1, 2),
@@ -384,8 +375,8 @@ public class MultiClusterTopicManagementService implements Service {
       while (newPartitionAssignments.size() != partitionDifference) {
         List replicas = new ArrayList<>();
         // leader replica/broker -
-        int brokerMetadata = randomBroker(brokers).id();
-        replicas.add(brokerMetadata);
+        int brokerId = randomBroker(brokers).id();
+        replicas.add(brokerId);
 
         newPartitionAssignments.add(replicas);
       }
@@ -394,7 +385,7 @@ public class MultiClusterTopicManagementService implements Service {
       // Regardless of the partition/replica assignments here, maybeReassignPartitionAndElectLeader()
       // will reassign the partition as needed periodically.
       for (List<Integer> replicas : newPartitionAssignments) {
-        for (BrokerMetadata broker : brokers) {
+        for (Node broker : brokers) {
           if (!replicas.contains(broker.id())) {
             replicas.add(broker.id());
           }
@@ -406,25 +397,18 @@ public class MultiClusterTopicManagementService implements Service {
       return newPartitionAssignments;
     }
 
-    private static BrokerMetadata randomBroker(Set<BrokerMetadata> brokers) {
+    private static Node randomBroker(Set<Node> brokers) {
 
       if (brokers == null || brokers.size() == 0) {
         throw new IllegalArgumentException("brokers object is either null or empty.");
       }
 
-      // Using Set enforces the usage of loop which is O(n).
-      // As the list of brokers does not change in newPartitionAssignments,
-      // the acceptance of a List argument instead of a Set will be faster which is (O(1))
-      List<BrokerMetadata> brokerMetadataList = new ArrayList<>(brokers);
-      // convert to a list so there's no need to create a index and iterate through this set
-      //addAll() is replaced with parameterized constructor call for better performance..
-
-      int brokerSetSize = brokers.size();
+      List<Node> brokerList = new ArrayList<>(brokers);
 
       // In practicality, the Random object should be rather more shared than this.
-      int random = new Random().nextInt(brokerSetSize);
+      int random = new Random().nextInt(brokers.size());
 
-      return brokerMetadataList.get(random);
+      return brokerList.get(random);
     }
 
     /**
@@ -547,37 +531,18 @@ public class MultiClusterTopicManagementService implements Service {
     private static void reassignPartitions(AdminClient adminClient, Collection<Node> brokers, String topic,
         int partitionCount, int replicationFactor) {
 
-      scala.collection.mutable.ArrayBuffer<BrokerMetadata> brokersMetadata =
-          new scala.collection.mutable.ArrayBuffer<>(brokers.size());
-      for (Node broker : brokers) {
-        brokersMetadata.$plus$eq(new BrokerMetadata(broker.id(), Option$.MODULE$.apply(broker.rack())));
-      }
-      scala.collection.Map<Object, Seq<Object>> assignedReplicas =
-          AdminUtils.assignReplicasToBrokers(brokersMetadata, partitionCount, replicationFactor, 0, 0);
-      scala.collection.immutable.Map<TopicPartition, Seq<Object>> newAssignment =
-          new scala.collection.immutable.HashMap<>();
-      scala.collection.Iterator<scala.Tuple2<Object, scala.collection.Seq<Object>>> it = assignedReplicas.iterator();
-      while (it.hasNext()) {
-        scala.Tuple2<Object, scala.collection.Seq<Object>> scalaTuple = it.next();
-        TopicPartition tp = new TopicPartition(topic, (Integer) scalaTuple._1);
-        newAssignment = newAssignment.$plus(new scala.Tuple2<>(tp, scalaTuple._2));
-      }
+      Map<Integer, List<Integer>> assignedReplicas =
+          assignReplicasToBrokers(new ArrayList<>(brokers), partitionCount, replicationFactor);
 
       String newAssignmentJson = formatAsNewReassignmentJson(topic, assignedReplicas);
       LOGGER.info("Reassign partitions for topic " + topic);
       LOGGER.info("New topic partition replica assignments: {}", newAssignmentJson);
 
-      Set<Map.Entry<TopicPartition, Seq<Object>>> newAssignmentMap =
-          scala.collection.JavaConverters.mapAsJavaMap(newAssignment).entrySet();
       Map<TopicPartition, Optional<NewPartitionReassignment>> reassignments = new HashMap<>();
-      for (Map.Entry<TopicPartition, Seq<Object>> topicPartitionSeqEntry : newAssignmentMap) {
-        List<Integer> targetReplicas = new ArrayList<>();
-        List<Object> replicas = JavaConverters.seqAsJavaList(topicPartitionSeqEntry.getValue());
-        for (Object replica : replicas) {
-          targetReplicas.add((int) replica);
-        }
-        NewPartitionReassignment newPartitionReassignment = new NewPartitionReassignment(targetReplicas);
-        reassignments.put(topicPartitionSeqEntry.getKey(), Optional.of(newPartitionReassignment));
+      for (Map.Entry<Integer, List<Integer>> entry : assignedReplicas.entrySet()) {
+        TopicPartition tp = new TopicPartition(topic, entry.getKey());
+        NewPartitionReassignment newPartitionReassignment = new NewPartitionReassignment(entry.getValue());
+        reassignments.put(tp, Optional.of(newPartitionReassignment));
       }
 
       AlterPartitionReassignmentsResult alterPartitionReassignmentsResult =
@@ -585,9 +550,29 @@ public class MultiClusterTopicManagementService implements Service {
       try {
         alterPartitionReassignmentsResult.all().get();
       } catch (InterruptedException | ExecutionException e) {
-
         LOGGER.error("An exception occurred while altering the partition reassignments for {}", topic, e);
       }
+    }
+
+    static Map<Integer, List<Integer>> assignReplicasToBrokers(List<Node> brokers,
+        int partitionCount, int replicationFactor) {
+      Map<Integer, List<Integer>> assignment = new HashMap<>();
+      List<Integer> brokerIds = new ArrayList<>();
+      for (Node broker : brokers) {
+        brokerIds.add(broker.id());
+      }
+      Collections.sort(brokerIds);
+      int brokerCount = brokerIds.size();
+
+      for (int partition = 0; partition < partitionCount; partition++) {
+        List<Integer> replicas = new ArrayList<>();
+        int startIndex = partition % brokerCount;
+        for (int j = 0; j < replicationFactor; j++) {
+          replicas.add(brokerIds.get((startIndex + j) % brokerCount));
+        }
+        assignment.put(partition, replicas);
+      }
+      return assignment;
     }
 
     static int getReplicationFactor(List<TopicPartitionInfo> partitionInfoList) {
@@ -679,7 +664,7 @@ public class MultiClusterTopicManagementService implements Service {
      * </pre>
      */
     private static String formatAsNewReassignmentJson(String topic,
-        scala.collection.Map<Object, Seq<Object>> partitionsToReassign) {
+        Map<Integer, List<Integer>> partitionsToReassign) {
       StringBuilder builder = new StringBuilder();
       builder.append("{\"version\":1,\"partitions\":[\n");
       for (int partition = 0; partition < partitionsToReassign.size(); partition++) {
@@ -688,10 +673,9 @@ public class MultiClusterTopicManagementService implements Service {
             .append("\",\"partition\":")
             .append(partition)
             .append(",\"replicas\":[");
-        Seq<Object> replicas = partitionsToReassign.apply(partition);
+        List<Integer> replicas = partitionsToReassign.get(partition);
         for (int replicaIndex = 0; replicaIndex < replicas.size(); replicaIndex++) {
-          Object replica = replicas.apply(replicaIndex);
-          builder.append(replica).append(",");
+          builder.append(replicas.get(replicaIndex)).append(",");
         }
         builder.setLength(builder.length() - 1);
         builder.append("]},\n");

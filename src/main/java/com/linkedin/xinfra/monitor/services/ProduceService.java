@@ -42,7 +42,7 @@ import org.apache.kafka.common.metrics.JmxReporter;
 import org.apache.kafka.common.metrics.MetricConfig;
 import org.apache.kafka.common.metrics.Metrics;
 import org.apache.kafka.common.metrics.MetricsReporter;
-import org.apache.kafka.common.utils.SystemTime;
+import org.apache.kafka.common.utils.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,7 +122,7 @@ public class ProduceService extends AbstractService {
     MetricConfig metricConfig = new MetricConfig().samples(60).timeWindow(1000, TimeUnit.MILLISECONDS);
     List<MetricsReporter> reporters = new ArrayList<>();
     reporters.add(new JmxReporter(JMX_PREFIX));
-    Metrics metrics = new Metrics(metricConfig, reporters, new SystemTime());
+    Metrics metrics = new Metrics(metricConfig, reporters, Time.SYSTEM);
     Map<String, String> tags = new HashMap<>();
     tags.put("name", _name);
     _sensors =

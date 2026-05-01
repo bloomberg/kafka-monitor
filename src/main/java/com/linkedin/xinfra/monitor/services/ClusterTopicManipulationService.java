@@ -31,7 +31,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import kafka.admin.BrokerMetadata;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.CreateTopicsResult;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -44,7 +43,7 @@ import org.apache.kafka.common.metrics.MetricConfig;
 import org.apache.kafka.common.metrics.Metrics;
 import org.apache.kafka.common.metrics.MetricsReporter;
 import org.apache.kafka.common.requests.DescribeLogDirsResponse;
-import org.apache.kafka.common.utils.SystemTime;
+import org.apache.kafka.common.utils.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +84,7 @@ public class ClusterTopicManipulationService implements Service {
     MetricConfig metricConfig = new MetricConfig().samples(60).timeWindow(1000, TimeUnit.MILLISECONDS);
     List<MetricsReporter> reporters = new ArrayList<>();
     reporters.add(new JmxReporter(Service.JMX_PREFIX));
-    Metrics metrics = new Metrics(metricConfig, reporters, new SystemTime());
+    Metrics metrics = new Metrics(metricConfig, reporters, Time.SYSTEM);
     Map<String, String> tags = new HashMap<>();
     tags.put("name", name);
     TopicManagementServiceConfig config = new TopicManagementServiceConfig(props);
@@ -164,11 +163,7 @@ public class ClusterTopicManipulationService implements Service {
       try {
         int brokerCount = _adminClient.describeCluster().nodes().get().size();
 
-        Set<BrokerMetadata> brokers = new HashSet<>();
-        for (Node broker : _adminClient.describeCluster().nodes().get()) {
-          BrokerMetadata brokerMetadata = new BrokerMetadata(broker.id(), null);
-          brokers.add(brokerMetadata);
-        }
+        Set<Node> brokers = new HashSet<>(_adminClient.describeCluster().nodes().get());
         Set<Integer> excludedBrokers = _topicFactory.getExcludedBrokers(_adminClient);
         if (!excludedBrokers.isEmpty()) {
           brokers.removeIf(broker -> excludedBrokers.contains(broker.id()));
