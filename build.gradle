@@ -32,8 +32,8 @@ dependencies {
   implementation libs.graphite.client
   implementation libs.java.statsd.client
   implementation libs.signalfx.codahale
-  implementation libs.kafka
   implementation libs.kafka.clients
+  implementation libs.kafka.server.common
   implementation libs.commons.lang3
   implementation libs.avroutil1.helper.all
   implementation libs.zookeeper

@@ -35,6 +35,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.apache.kafka.admin.AdminUtils;
+import org.apache.kafka.admin.BrokerMetadata;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.AlterConfigOp;
@@ -531,8 +533,13 @@ public class MultiClusterTopicManagementService implements Service {
     private static void reassignPartitions(AdminClient adminClient, Collection<Node> brokers, String topic,
         int partitionCount, int replicationFactor) {
 
+      Collection<BrokerMetadata> brokerMetadatas = new ArrayList<>();
+      for (Node broker : brokers) {
+        brokerMetadatas.add(new BrokerMetadata(broker.id(), Optional.ofNullable(broker.rack())));
+      }
+
       Map<Integer, List<Integer>> assignedReplicas =
-          assignReplicasToBrokers(new ArrayList<>(brokers), partitionCount, replicationFactor);
+          AdminUtils.assignReplicasToBrokers(brokerMetadatas, partitionCount, replicationFactor);
 
       String newAssignmentJson = formatAsNewReassignmentJson(topic, assignedReplicas);
       LOGGER.info("Reassign partitions for topic " + topic);
@@ -552,27 +559,6 @@ public class MultiClusterTopicManagementService implements Service {
       } catch (InterruptedException | ExecutionException e) {
         LOGGER.error("An exception occurred while altering the partition reassignments for {}", topic, e);
       }
-    }
-
-    static Map<Integer, List<Integer>> assignReplicasToBrokers(List<Node> brokers,
-        int partitionCount, int replicationFactor) {
-      Map<Integer, List<Integer>> assignment = new HashMap<>();
-      List<Integer> brokerIds = new ArrayList<>();
-      for (Node broker : brokers) {
-        brokerIds.add(broker.id());
-      }
-      Collections.sort(brokerIds);
-      int brokerCount = brokerIds.size();
-
-      for (int partition = 0; partition < partitionCount; partition++) {
-        List<Integer> replicas = new ArrayList<>();
-        int startIndex = partition % brokerCount;
-        for (int j = 0; j < replicationFactor; j++) {
-          replicas.add(brokerIds.get((startIndex + j) % brokerCount));
-        }
-        assignment.put(partition, replicas);
-      }
-      return assignment;
     }
 
     static int getReplicationFactor(List<TopicPartitionInfo> partitionInfoList) {

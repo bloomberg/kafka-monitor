@@ -23,8 +23,8 @@ graphite-client = { module = "net.savantly:graphite-client", version.ref = "grap
 java-statsd-client = { module = "com.timgroup:java-statsd-client", version.ref = "java-statsd-client" }
 jolokia-jvm = { module = "org.jolokia:jolokia-jvm", version.ref = "jolokia" }
 json = { module = "org.json:json", version.ref = "json" }
-kafka = { module = "org.apache.kafka:kafka_2.12", version.ref = "kafka" }
 kafka-clients = { module = "org.apache.kafka:kafka-clients", version.ref = "kafka" }
+kafka-server-common = { module = "org.apache.kafka:kafka-server-common", version.ref = "kafka" }
 log4j-slf4j-impl = { module = "org.apache.logging.log4j:log4j-slf4j-impl", version.ref = "log4j" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 signalfx-codahale = { module = "com.signalfx.public:signalfx-codahale", version.ref = "signalfx" }
