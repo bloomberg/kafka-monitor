@@ -13,6 +13,10 @@ release:
   github:
     overwrite: true
     tagName: "{{projectVersion}}"
+    issues:
+      enabled: false
+    milestone:
+      close: false
     changelog:
       formatted: ALWAYS
       format: "- {{commitShortHash}} {{commitTitle}}"
