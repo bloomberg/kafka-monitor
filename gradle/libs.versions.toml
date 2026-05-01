@@ -1,6 +1,6 @@
 [versions]
 argparse4j = "0.9.0"
-avro = "1.9.2"
+avro = "1.12.1"
 avroutil1 = "0.2.118"
 commons-lang3 = "3.12.0"
 graphite-client = "1.1.0-RELEASE"
@@ -11,7 +11,7 @@ kafka = "2.8.2"
 log4j = "2.25.4"
 mockito = "3.12.4"
 signalfx = "0.0.47"
-testng = "6.8.8"
+testng = "7.12.0"
 zookeeper = "3.8.0"
 
 [libraries]
