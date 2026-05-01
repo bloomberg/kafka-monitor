@@ -128,9 +128,7 @@ publishing {
   }
 }
 
-artifacts {
-  archives testJar
-}
+assemble.dependsOn testJar
 
 checkstyle {
   configFile = new File(rootDir, "checkstyle/checkstyle.xml")
@@ -197,6 +195,6 @@ tasks.withType(Tar){
 }
 
 wrapper {
-  gradleVersion = '8.14.3'
+  gradleVersion = '9.5.0'
   distributionType = Wrapper.DistributionType.ALL
 }
