@@ -2,17 +2,17 @@
 argparse4j = "0.9.0"
 avro = "1.12.1"
 avroutil1 = "0.2.118"
-commons-lang3 = "3.12.0"
+commons-lang3 = "3.20.0"
 graphite-client = "2.0.0-RELEASE"
-java-statsd-client = "3.0.2"
+java-statsd-client = "3.1.0"
 jolokia = "1.7.2"
 json = "20140107"
 kafka = "2.8.2"
 log4j = "2.25.4"
-mockito = "3.12.4"
+mockito = "5.23.0"
 signalfx = "0.0.47"
 testng = "7.12.0"
-zookeeper = "3.8.0"
+zookeeper = "3.9.5"
 
 [libraries]
 argparse4j = { module = "net.sourceforge.argparse4j:argparse4j", version.ref = "argparse4j" }
