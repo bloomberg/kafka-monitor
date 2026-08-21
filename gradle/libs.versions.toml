@@ -1,6 +1,6 @@
 [versions]
 argparse4j = "0.9.0"
-avro = "1.12.1"
+avro = "1.12.2"
 avroutil1 = "0.4.39"
 commons-lang3 = "3.20.0"
 graphite-client = "2.0.0-RELEASE"
